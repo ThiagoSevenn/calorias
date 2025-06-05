@@ -48,3 +48,18 @@
                   (:body	response)	=>
                       "{\"id\":1,\"data\":\"data\",\"nome\":\"nome\",\"valor\":10,\"tipo\":\"ganho\"}")))
 
+(facts "Registra	um usuario"
+  ;;	cria	um	mock	para	a	função	db/registrar
+  (against-background	(db/cadastrar-usuario	{:altura 170 :peso 72 :idade 21 :sexo "M"})
+      =>	{:altura 170 :peso 72 :idade 21 :sexo "M"})
+
+  (let	[response (app	(->	(mock/request	:post	"/usuario")
+      ;;	cria	o	conteúdo	do	POST
+                            (mock/json-body	{:altura 170 :peso 72 :idade 21 :sexo "M"})))]
+      (fact "o	status	da	resposta	é	201"
+                  (:status	response)	=>	201)
+      (fact "o	texto	do	corpo	é	um	JSON com	o	conteúdo	enviado	e	um	id"
+                  (:body	response)	=>
+                      "{\"altura\":170,\"peso\":72,\"idade\":21,\"sexo\":\"M\"}")))
+
+

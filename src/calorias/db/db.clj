@@ -2,13 +2,14 @@
 (ns calorias.db.db)
 
 ;; usuario
-(def usuario (atom {}))
-
-(defn cadastrar-usuario [dados]
-    (swap! usuario conj dados))
+(def usuario (atom []))
 
 (defn limpar-usuario []
-    (reset! usuario))
+    (reset! usuario []))
+
+(defn cadastrar-usuario [dados]
+    (limpar-usuario)
+    (swap! usuario conj dados))
 
 (defn info-usuario []
     @usuario)
@@ -44,8 +45,17 @@
             (- ganhoCalorico perdaCalorica))))
 
 ;; consultar dados 
+(defn adicionar-id [id dado]
+    (merge dado {:id id}))
+
 (defn consultarGeral []
-    @registros)
+    (let [colecao @registros
+          quantidade (+ 1 (count colecao))
+          contador (range 1 quantidade 1)]
+        (doall (map adicionar-id contador colecao))))
 
 (defn consultarEspecifico [tipo]
-    (filtro tipo))
+    (let [colecao (filtro tipo)
+          quantidade (+ 1 (count colecao))
+          contador (range 1 quantidade 1)]
+        (doall (map adicionar-id contador colecao))))

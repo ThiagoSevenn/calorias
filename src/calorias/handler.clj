@@ -4,8 +4,14 @@
             [cheshire.core	:as	json]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json	:refer	[wrap-json-body]]
+
+            ;; bd e validação
             [calorias.db.db :as db]
-            [calorias.db.transacoes	:as	transacoes]))
+            [calorias.db.transacoes	:as	transacoes]
+
+            ;; api-alimento e api-exercicio
+            [calorias.requisicoes.reqAlimentos :as alimentos]
+            [calorias.requisicoes.reqExercicios :as exercicios]))
 
 (defn como-json [conteudo &	[status]]
     {:status	(or	status	200)
@@ -15,21 +21,22 @@
 
 (defroutes app-routes
   (GET "/" [] "Olá, mundo!")
-
+  (GET "/usuario" [] (como-json {:usuario (db/info-usuario)}))
   ;; exibe o saldo
   (GET "/saldo" [] (como-json {:saldo (db/saldo)}))
   
   ;; consulta alimentos e/ou exercicios (por periodo ou total)
-  (GET "/alimentos" [] (como-json {:transacoes (db/consultarEspecifico "ganho")}))
-  (GET "/exercicios" [] (como-json {:transacoes (db/consultarEspecifico "perda")}))
-  (GET "/resumo/total" [] (como-json {:transacoes (db/consultarGeral)}))
+  (GET "/alimentos" [] (como-json {:alimentos (db/consultarEspecifico "ganho")}))
+  (GET "/exercicios" [] (como-json {:exercicios (db/consultarEspecifico "perda")}))
+  (GET "/resumo/total" [] (como-json {:registros (db/consultarGeral)}))
   (GET "/resumo/periodo" [] (como-json (db/consultarGeral)))
 
-  (POST "/usuario" requisicao 
-    (if (empty? (db/info-usuario))
-        (-> (db/cadastrar-usuario (:body requisicao))
-            (como-json 201))
-        (como-json {:mensagem "Não foi possivel cadastrar o usuário."} 422)))
+  (POST "/exercicios" requisicao (-> (exercicios/registrar-exercicio (:body requisicao))
+                                    (como-json 201)))
+  (POST "/alimentos" requisicao (-> (alimentos/registrar-alimento (:body requisicao))
+                                    (como-json 201)))
+  (POST "/usuario" requisicao (-> (db/cadastrar-usuario (:body requisicao))
+                                  (como-json 201)))
 
   (POST "/transacoes"	requisicao
 		(if	(transacoes/valida?	(:body requisicao))
