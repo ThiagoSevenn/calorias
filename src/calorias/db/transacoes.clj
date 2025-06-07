@@ -4,10 +4,10 @@
 ;; validar o registro de refeição ou exercício
 (defn valida? [registro]
     (and (contains? registro :nome)
-         (contains? registro :valor)
+         (contains? registro :calorias)
          (contains? registro :tipo)
          (contains? registro :data)
-         (number? (registro :valor))
-         (pos? (registro :valor))
+         (number? (registro :calorias))
+         (pos? (registro :calorias))
          (or (= "ganho" (:tipo registro))
              (= "perda" (:tipo registro)))))

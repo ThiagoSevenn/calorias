@@ -28,7 +28,7 @@
   ;; consulta alimentos e/ou exercicios (por periodo ou total)
   (GET "/alimentos" [] (como-json {:alimentos (db/consultarEspecifico "ganho")}))
   (GET "/exercicios" [] (como-json {:exercicios (db/consultarEspecifico "perda")}))
-  (GET "/resumo/total" [] (como-json {:registros (db/consultarGeral)}))
+  (GET "/registros" [] (como-json {:registros (db/consultarGeral)}))
   (GET "/resumo/periodo" [] (como-json (db/consultarGeral)))
 
   (POST "/exercicios" requisicao (-> (exercicios/registrar-exercicio (:body requisicao))

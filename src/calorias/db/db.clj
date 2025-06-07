@@ -1,5 +1,6 @@
 ;; FEITO!!  
-(ns calorias.db.db)
+(ns calorias.db.db
+    (:require [clojure.string :as str]))
 
 ;; usuario
 (def usuario (atom []))
@@ -15,6 +16,14 @@
     @usuario)
 
 ;; registros
+;; transforma a data em um tipo int formatado
+(defn formatar-data [dataBruta]
+    (let[data (reverse (str/split dataBruta #"/"))
+         vetorInt (doall (map #(Integer/parseInt %) data))
+         vetorMultiplicador [10000 100 1]
+         dataInt (apply + (doall (map #(* %1 %2) vetorInt vetorMultiplicador)))]
+        dataInt))
+
 ;; inicializa um atom
 (def registros (atom []))
 
@@ -29,19 +38,14 @@
 ;; cadastra um registro e adiciona seu id
 (defn cadastrar [objeto]
     (let [colecao-atualizada (swap! registros conj objeto)]
-        (merge objeto {:id (count colecao-atualizada)}))
+        (merge objeto {:id (count colecao-atualizada)})))
 
-    ;; (let []
-    ;;     (if (= "ganho" (:tipo objeto))
-    ;;         (swap! registros conj (merge objeto {:id (count (filtro "ganho"))}))
-    ;;         (swap! registros conj (merge objeto {:id (count (filtro "perda"))})))))
-)
 ;; saldo de caloria (quantidade ingerida - quantidade gasta)
 (defn saldo []
     (if (empty? @registros)
         0
-        (let [ganhoCalorico (apply + (doall (map :valor (filtro "ganho"))))
-              perdaCalorica (apply + (doall (map :valor (filtro "perda"))))]
+        (let [ganhoCalorico (apply + (doall (map :calorias (filtro "ganho"))))
+              perdaCalorica (apply + (doall (map :calorias (filtro "perda"))))]
             (- ganhoCalorico perdaCalorica))))
 
 ;; consultar dados 
@@ -59,3 +63,5 @@
           quantidade (+ 1 (count colecao))
           contador (range 1 quantidade 1)]
         (doall (map adicionar-id contador colecao))))
+
+        
