@@ -2,6 +2,14 @@
 (ns calorias.db.db
     (:require [clojure.string :as str]))
 
+;; registros
+;; inicializa um atom
+(def registros (atom []))
+
+;; reseta o atom 
+(defn limpar-registros []
+    (reset! registros []))
+
 ;; usuario
 (def usuario (atom []))
 
@@ -10,26 +18,11 @@
 
 (defn cadastrar-usuario [dados]
     (limpar-usuario)
+    (limpar-registros)
     (swap! usuario conj dados))
 
 (defn info-usuario []
     @usuario)
-
-;; registros
-;; transforma a data em um tipo int formatado
-(defn formatar-data [dataBruta]
-    (let[data (reverse (str/split dataBruta #"/"))
-         vetorInt (doall (map #(Integer/parseInt %) data))
-         vetorMultiplicador [10000 100 1]
-         dataInt (apply + (doall (map #(* %1 %2) vetorInt vetorMultiplicador)))]
-        dataInt))
-
-;; inicializa um atom
-(def registros (atom []))
-
-;; reseta o atom
-(defn limpar-registros []
-    (reset! registros []))
 
 ;; filtro em registros de acordo com o tipo
 (defn filtro [tipo]
