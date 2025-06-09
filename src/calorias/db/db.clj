@@ -6,6 +6,18 @@
 ;; inicializa um atom
 (def registros (atom []))
 
+(def possiveis-exercicios (atom []))
+
+(defn limpar-exercicios []
+    (reset! possiveis-exercicios []))
+
+(defn cadastrar-possiveis-exercicios [dados]
+    (limpar-exercicios)
+    (swap! possiveis-exercicios conj dados))
+
+(defn exibir-possiveis-exercicios []
+    @possiveis-exercicios)
+
 ;; reseta o atom 
 (defn limpar-registros []
     (reset! registros []))
